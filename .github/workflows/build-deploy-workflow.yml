@@ -41,7 +41,7 @@ jobs:
             export PR_TITLE="${{ secrets.AWS_ECR_REPOSITORY }} : ${{ github.event.head_commit.message }}"
           fi
           export PR_TITLE=$(echo "${PR_TITLE}" | tr -d '"<>' | tr '"\r\n' ' ')
-          env
+          echo $PR_URL
           echo $(envsubst < ./.github/workflows/slack-templates/approved.json) > notification-approved.json
           cat notification-approved.json
 
