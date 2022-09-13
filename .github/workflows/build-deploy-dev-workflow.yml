@@ -1,12 +1,6 @@
 name: Master Build-Deploy Dev
 
 on:
-  push:
-    branches: [ master ]
-    tags: 
-      - 'dev*'
-    paths-ignore:
-      - '.github/**'
   workflow_call:
 
 env:
