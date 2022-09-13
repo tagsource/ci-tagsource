@@ -28,12 +28,20 @@ jobs:
       - name: Prepare slack templates
         id: slack
         env:
-          USER: ${{ github.event.head_commit.author.username }}
-          PR_URL: ${{ github.event.head_commit.url }}
-          PR_TITLE: ${{ github.event.head_commit.message }}
           JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          #REPO: ${{ secrets.AWS_ECR_REPOSITORY }}
         run: |
+          if [ -z "$GITHUB_REF_NAME" ]; then
+            export USER=${{ github.event.head_commit.author.username }}
+            export PR_URL="https://github.com/tagsource/${{ secrets.AWS_ECR_REPOSITORY }}/releases/tag/${{  github.ref_name }}"
+            export PR_TITLE="Release ${{ secrets.AWS_ECR_REPOSITORY }} tag ${{  github.ref_name }} on ${{ inputs.env }}"
+          else
+            export USER=${{ github.event.head_commit.author.username }}
+            export PR_URL=${{ github.event.head_commit.url }}
+            export PR_TITLE="${{ secrets.AWS_ECR_REPOSITORY }} : ${{ github.event.head_commit.message }}"
+          fi
           export PR_TITLE=$(echo "${PR_TITLE}" | tr -d '"<>' | tr '"\r\n' ' ')
+          echo $PR_URL
           echo $(envsubst < ./.github/workflows/slack-templates/approved.json) > notification-approved.json
           cat notification-approved.json
 
