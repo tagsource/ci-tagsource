@@ -32,6 +32,7 @@ jobs:
           PR_URL: ${{ github.event.head_commit.url }}
           PR_TITLE: ${{ github.event.head_commit.message }}
           JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          REPO: ${{ secrets.AWS_ECR_REPOSITORY }}
         run: |
           export PR_TITLE=$(echo "${PR_TITLE}" | tr -d '"<>' | tr '"\r\n' ' ')
           echo $(envsubst < ./.github/workflows/slack-templates/approved.json) > notification-approved.json
