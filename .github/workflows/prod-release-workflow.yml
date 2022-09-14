@@ -12,6 +12,8 @@ env:
   CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
   CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  GH_DRAFT: ${{ github.event.release.draft }}
+  GH_PRERELEASE: ${{ github.event.release.prerelease }}
   
 jobs:
   deploy_prod:
@@ -37,6 +39,32 @@ jobs:
         id: changes
         run: |
           echo "Released ${{ github.ref }}"
+
+  rollback_stage_prod:
+    #needs: deploy
+    runs-on: ubuntu-latest
+    if: ${{ GH_PRERELEASE }} && ! ${{ GH_DRAFT }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Fetch git tags
+        id: git-fetch
+        run: |
+          git fetch -a
+          echo ::set-output name=previous_tag::$(git tag --sort version:refname | tail -2 | head -1)
+          git tag --sort "-committerdate" 
+
+      - name: Logging
+        run: |
+         sudo apt-get install systemd moreutils -yq
+         echo "${{toJSON(github.event)}}"   
+
+      - name: ReleasePublished
+        id: changes
+        run: |
+          echo "Rollback to ${{ steps.git-fetch.outputs.previous_tag }}"
 
   # build_deploy_child:
   #   uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
