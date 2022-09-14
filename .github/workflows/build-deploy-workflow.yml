@@ -122,7 +122,7 @@ jobs:
           fi
           echo "Updating service ${ENV} / ${SERVICE} with Tag ${IMAGE_TAG}"
           #ls -l
-          sed -i '' 's/\(.*tag.*\)[^ ]*\( .*\)/\1 "${IMAGE_TAG}"/' ${DEPLOY_PATH}/terragrunt.hcl
+          sed -i '' 's/\(.*tag.*\)[^ ]*\( .*\)/\1 \"${IMAGE_TAG}\"/' ${DEPLOY_PATH}/terragrunt.hcl
           git diff
           git add .
           git commit -m ${COMMIT_MESSAGE}
