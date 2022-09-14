@@ -12,14 +12,12 @@ env:
   CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
   CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-  GH_DRAFT: ${{ github.event.release.draft }}
-  GH_PRERELEASE: ${{ github.event.release.prerelease }}
   
 jobs:
   deploy_prod:
     #needs: deploy
     runs-on: ubuntu-latest
-    # if: ! ${{ GH_PRERELEASE }} && ! ${{ GH_DRAFT }}
+    if: ! ${{ github.event.release.prerelease }} && ! ${{ github.event.release.draft }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -43,7 +41,7 @@ jobs:
   rollback_stage_prod:
     #needs: deploy
     runs-on: ubuntu-latest
-    if: ${{ GH_PRERELEASE }} && ! ${{ GH_DRAFT }}
+    if: ${{ github.event.release.prerelease }} && ! ${{ github.event.release.draft }}
     steps:
       - uses: actions/checkout@v2
         with:
