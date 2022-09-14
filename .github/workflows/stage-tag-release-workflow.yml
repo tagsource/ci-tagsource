@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          
+
       - name: Fetch git tags
         id: git-fetch
         run: |
@@ -30,6 +30,7 @@ jobs:
           git tag --sort "-committerdate" 
 
       - name: Build Release notes
+        id: changes
         run: |
           git log --pretty=format:"%s - author: %cn" 
           export DIFF=$(git log --pretty=format:"%s - author: %cn" ${{ steps.git-fetch.outputs.previous_tag }}..${{ github.ref }} )
