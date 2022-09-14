@@ -44,7 +44,8 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          body: "${{ steps.changes.outputs.diff }}"
+          body: |
+            "${{ steps.changes.outputs.diff }}"
           draft: false
           prerelease: true
 
