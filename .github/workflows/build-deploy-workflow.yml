@@ -156,22 +156,22 @@ jobs:
         id: aws_auth_check_identity
         run: aws sts get-caller-identity
 
-      - name: DeployDockerImage
-        id: deploy_docker_image
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          DEFAULT_INFRA_LIVE_BRANCH: main
-          INFRA_REPO: "git@github.com:tagsource/infrastructure-live.git"
-          DEPLOY_PATH: "${{ inputs.env }}/ap-southeast-1/${{ inputs.env }}/services/${{ secrets.AWS_ECR_REPOSITORY }}"
-          IMAGE_TAG: ${{ inputs.tag }}
-          GITHUB_OAUTH_TOKEN: ${{ secrets.GH_GRUNTY_OAUTH_TOKEN }}
-        run: |
-            update_args=(--aws-region "$AWS_REGION" --)
-            update_args+=(terraform-applier terraform-update-variable)
-            update_args+=(--git-branch-name "$DEFAULT_INFRA_LIVE_BRANCH")
-            update_args+=(--git-url "$INFRA_REPO")
-            update_args+=(--vars-path "${DEPLOY_PATH}/terragrunt.hcl")
-            update_args+=(--name "tag" --value "\"$IMAGE_TAG\"")
-            update_args+=(--skip-ci-flag "")
-            infrastructure-deployer "${update_args[@]}"
+      # - name: DeployDockerImage
+      #   id: deploy_docker_image
+      #   env:
+      #     AWS_REGION: ${{ secrets.AWS_REGION }}
+      #     DEFAULT_INFRA_LIVE_BRANCH: main
+      #     INFRA_REPO: "git@github.com:tagsource/infrastructure-live.git"
+      #     DEPLOY_PATH: "${{ inputs.env }}/ap-southeast-1/${{ inputs.env }}/services/${{ secrets.AWS_ECR_REPOSITORY }}"
+      #     IMAGE_TAG: ${{ inputs.tag }}
+      #     GITHUB_OAUTH_TOKEN: ${{ secrets.GH_GRUNTY_OAUTH_TOKEN }}
+      #   run: |
+      #       update_args=(--aws-region "$AWS_REGION" --)
+      #       update_args+=(terraform-applier terraform-update-variable)
+      #       update_args+=(--git-branch-name "$DEFAULT_INFRA_LIVE_BRANCH")
+      #       update_args+=(--git-url "$INFRA_REPO")
+      #       update_args+=(--vars-path "${DEPLOY_PATH}/terragrunt.hcl")
+      #       update_args+=(--name "tag" --value "\"$IMAGE_TAG\"")
+      #       update_args+=(--skip-ci-flag "")
+      #       infrastructure-deployer "${update_args[@]}"
 
