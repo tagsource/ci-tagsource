@@ -17,6 +17,7 @@ jobs:
   deploy_prod:
     #needs: deploy
     runs-on: ubuntu-latest
+    if: ! ${{ GH_PRERELEASE }} && ! ${{ GH_DRAFT }}
     steps:
       - uses: actions/checkout@v2
         with:
