@@ -123,9 +123,12 @@ jobs:
           echo "Updating service ${ENV} / ${SERVICE} with Tag ${IMAGE_TAG}"
           #ls -l
           sed -i "s/\(.*tag.*\)[^ ]*\( .*\)/\1 \"${IMAGE_TAG}\"/" ${DEPLOY_PATH}/terragrunt.hcl
+          git config user.name ${{ github.event.head_commit.author.username }}
+          git config user.email grunty@tagme.pk
           git diff
           git add .
           git commit -m ${COMMIT_MESSAGE}
+          git push
 
       - name: SetupInfrastructureDeployer
         id: setup_deployer
