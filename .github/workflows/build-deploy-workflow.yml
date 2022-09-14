@@ -6,6 +6,12 @@ on:
       env:
         required: true
         type: string
+      tag:
+        required: true
+        type: string
+      action:
+        required: true
+        type: string
 
 
 env:
@@ -29,7 +35,7 @@ jobs:
         id: slack
         env:
           JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          TITLE: "$${{ secrets.AWS_ECR_REPOSITORY }} : Deploy action was triggered! Kicking off the apply on ${{ inputs.env }}. :white_check_mark:"
+          TITLE: "$${{ secrets.AWS_ECR_REPOSITORY }} : ${{ inputs.action }} action was triggered! Kicking off the apply on ${{ inputs.env }}. :white_check_mark:"
         run: |
           if [[ "${{ github.ref }}" == *"tags"* ]]; then
             export USER=${{ github.event.head_commit.author.username }}
@@ -85,7 +91,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ECR_REPOSITORY_URL }}
           ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ inputs.tag }}
         run: |
           ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG          
@@ -133,7 +139,7 @@ jobs:
           DEFAULT_INFRA_LIVE_BRANCH: main
           INFRA_REPO: "git@github.com:tagsource/infrastructure-live.git"
           DEPLOY_PATH: "${{ inputs.env }}/ap-southeast-1/${{ inputs.env }}/services/${{ secrets.AWS_ECR_REPOSITORY }}"
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ inputs.tag }}
           GITHUB_OAUTH_TOKEN: ${{ secrets.GH_GRUNTY_OAUTH_TOKEN }}
         run: |
             update_args=(--aws-region "$AWS_REGION" --)

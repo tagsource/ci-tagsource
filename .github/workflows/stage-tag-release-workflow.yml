@@ -50,8 +50,10 @@ jobs:
           draft: true
           prerelease: true
 
-  # build_deploy_child:
-  #   uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
-  #   secrets: inherit
-  #   with:
-  #     env: dev
+  build_deploy_stage:
+    uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
+    secrets: inherit
+    with:
+      env: stage
+      tag: ${{  github.ref_name }}
+      action: Deploy

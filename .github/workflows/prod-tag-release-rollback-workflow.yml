@@ -14,8 +14,17 @@ env:
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   
 jobs:
-  deploy_prod:
-    #needs: deploy
+  build_deploy_prod:
+    if: github.event_name == 'release' && ! github.event.release.draft && ! github.event.release.prerelease
+    uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
+    secrets: inherit
+    with:
+      env: prod
+      tag: ${{  github.ref_name }}
+      action: Deploy
+
+  deploy_prod_log:
+    needs: deploy
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && ! github.event.release.draft && ! github.event.release.prerelease
     steps:
@@ -38,9 +47,11 @@ jobs:
         run: |
           echo "Releasing ${{ github.event.release.tag_name }} to prod as a result of Publish Release event!"
 
-  rollback_stage_prod:
+  rollback_stage_prod_prepare:
     #needs: deploy
     runs-on: ubuntu-latest
+    outputs:
+      previous_tag: ${{ steps.git-fetch.outputs.previous_tag }}
     if: github.event_name == 'release' && ! github.event.release.draft && github.event.release.prerelease
     steps:
       - uses: actions/checkout@v2
@@ -64,8 +75,21 @@ jobs:
         run: |
           echo "Rollback to ${{ steps.git-fetch.outputs.previous_tag }} to prod as a result of Publish PreRelease event!"
 
-  # build_deploy_child:
-  #   uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
-  #   secrets: inherit
-  #   with:
-  #     env: dev
+  rollback_stage:
+    needs: rollback_stage_prod_prepare
+    if: github.event_name == 'release' && ! github.event.release.draft && ! github.event.release.prerelease
+    uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
+    secrets: inherit
+    with:
+      env: stage
+      tag: ${{needs.rollback_stage_prod_prepare.outputs.previous_tag}}
+      action: Rollback
+
+  rollback_prod:
+    if: github.event_name == 'release' && ! github.event.release.draft && ! github.event.release.prerelease
+    uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
+    secrets: inherit
+    with:
+      env: prod
+      tag: ${{needs.rollback_stage_prod_prepare.outputs.previous_tag}}
+      action: Rollback
