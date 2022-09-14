@@ -99,6 +99,31 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: CheckoutInfrastructureLive
+        uses: actions/checkout@v3
+        with:
+          repository: 'tagsource/infrastructure-live'
+          token: ${{ secrets.GH_GRUNTY_OAUTH_TOKEN }}
+          ssh-key: ${{ secrets.GH_SSH_KEY }}
+          fetch-depth: 0
+
+      - name: UpdateInfraLive
+        id: update_live
+        env: 
+          SERVICE: ${{ secrets.AWS_ECR_REPOSITORY }}
+          ENV: ${{ inputs.env }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          DEPLOY_PATH: "${{ inputs.env }}/ap-southeast-1/${{ inputs.env }}/services/${{ secrets.AWS_ECR_REPOSITORY }}"
+        run: |
+          if [[ "${{ github.ref }}" == *"tags"* ]]; then
+            export COMMIT_MESSAGE="Release ${{ secrets.AWS_ECR_REPOSITORY }} tag ${{  inputs.tag }} on ${{ inputs.env }}"
+          else
+            export COMMIT_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | tr -d '"<>' | tr '"\r\n' ' ')
+          fi
+          echo "Updating service ${ENV} / ${SERVICE} with Tag ${IMAGE_TAG}"
+          sed -i '' 's/\(.*tag.*\)[^ ]*\( .*\)/\1 "${IMAGE_TAG}"/' ${DEPLOY_PATH}/terragrunt.hcl
+          git add .
+          git commit -m ${COMMIT_MESSAGE}
 
       - name: SetupInfrastructureDeployer
         id: setup_deployer
@@ -149,3 +174,4 @@ jobs:
             update_args+=(--name "tag" --value "\"$IMAGE_TAG\"")
             update_args+=(--skip-ci-flag "")
             infrastructure-deployer "${update_args[@]}"
+
