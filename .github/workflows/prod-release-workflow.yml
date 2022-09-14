@@ -36,7 +36,7 @@ jobs:
       - name: ReleasePublished
         id: changes
         run: |
-          echo "Released ${{ github.event.release.tag_name }}"
+          echo "Releasing ${{ github.event.release.tag_name }} to prod as a result of Publish Release event!"
 
   rollback_stage_prod:
     #needs: deploy
@@ -59,10 +59,10 @@ jobs:
          sudo apt-get install systemd moreutils -yq
          echo "${{toJSON(github.event)}}"   
 
-      - name: ReleasePublished
+      - name: PreReleasePublished
         id: changes
         run: |
-          echo "Rollback to ${{ steps.git-fetch.outputs.previous_tag }}"
+          echo "Rollback to ${{ steps.git-fetch.outputs.previous_tag }} to prod as a result of Publish PreRelease event!"
 
   # build_deploy_child:
   #   uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
