@@ -85,7 +85,7 @@ jobs:
       action: Rollback
 
   rollback_prod:
-    needs: rollback_stage
+    needs: rollback_stage_prod_prepare
     if: github.event_name == 'release' && ! github.event.release.draft && ! github.event.release.prerelease
     uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
     secrets: inherit
