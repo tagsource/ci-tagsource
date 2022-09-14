@@ -38,9 +38,9 @@ jobs:
           else
             export USER=${{ github.event.head_commit.author.username }}
             export PR_URL=${{ github.event.head_commit.url }}
-            export PR_TITLE="${{ github.event.head_commit.message }}"
+            export PR_TITLE="$(echo ${{ github.event.head_commit.message } | tr -d '"<>' | tr '"\r\n' ' ')}"
           fi
-          export PR_TITLE=$(echo "${PR_TITLE}" | tr -d '"<>' | tr '"\r\n' ' ')
+          #export PR_TITLE=$(echo "${PR_TITLE}" | tr -d '"<>' | tr '"\r\n' ' ')
           echo $PR_URL
           echo $(envsubst < ./.github/workflows/slack-templates/approved.json) > notification-approved.json
           cat notification-approved.json
