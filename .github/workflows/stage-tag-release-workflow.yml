@@ -1,0 +1,50 @@
+name: Build-Deploy Workflow
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: true
+        type: string
+
+
+env:
+  CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+  CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  
+jobs:
+  create_release:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch git tags
+        id: git-fetch
+        run: |
+          git fetch -a
+          echo ::set-output name=previous_tag::$(git tag --sort version:refname | tail -2 | head -1)
+          git tag --sort "-committerdate" 
+
+      - name: Build Release notes
+        run: |
+          git log --pretty=format:"%s - author: %cn" 
+          export DIFF=$(git log --pretty=format:"%s - author: %cn" ${{ steps.git-fetch.outputs.previous_tag }}..${{ github.ref }} )
+          echo "::set-output name=diff::$( echo "$DIFF" | sed ':a;N;$!ba;s/\n/%0A/g' )"
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: "${{ steps.changes.outputs.diff }}"
+          draft: false
+          prerelease: true
+
+  # build_deploy_child:
+  #   uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
+  #   secrets: inherit
+  #   with:
+  #     env: dev
