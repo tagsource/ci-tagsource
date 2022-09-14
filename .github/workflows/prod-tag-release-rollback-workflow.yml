@@ -47,7 +47,7 @@ jobs:
         run: |
           echo "Releasing ${{ github.event.release.tag_name }} to prod as a result of Publish Release event!"
 
-  rollback_stage_prod_prepare:
+  rollback_prepare:
     runs-on: ubuntu-latest
     outputs:
       previous_tag: ${{ steps.git-fetch.outputs.previous_tag }}
@@ -75,21 +75,21 @@ jobs:
           echo "Rollback to ${{ steps.git-fetch.outputs.previous_tag }} to prod as a result of Publish PreRelease event!"
 
   rollback_stage:
-    needs: rollback_stage_prod_prepare
+    needs: rollback_prepare
     if: github.event_name == 'release' && ! github.event.release.draft && ! github.event.release.prerelease
     uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
     secrets: inherit
     with:
       env: stage
-      tag: ${{needs.rollback_stage_prod_prepare.outputs.previous_tag}}
+      tag: ${{needs.rollback_prepare.outputs.previous_tag}}
       action: Rollback
 
   rollback_prod:
-    needs: rollback_stage_prod_prepare
+    needs: rollback_prepare
     if: github.event_name == 'release' && ! github.event.release.draft && ! github.event.release.prerelease
     uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
     secrets: inherit
     with:
       env: prod
-      tag: ${{needs.rollback_stage_prod_prepare.outputs.previous_tag}}
+      tag: ${{needs.rollback_prepare.outputs.previous_tag}}
       action: Rollback
