@@ -15,7 +15,7 @@ env:
   
 jobs:
   create_release:
-    needs: deploy
+    #needs: deploy
     runs-on: ubuntu-latest
     steps:
       - name: Fetch git tags
