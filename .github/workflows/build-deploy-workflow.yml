@@ -40,7 +40,7 @@ jobs:
           if [[ "${{ github.ref }}" == *"tags"* ]]; then
             export USER=${{ github.event.head_commit.author.username }}
             export PR_URL="https://github.com/tagsource/${{ secrets.AWS_ECR_REPOSITORY }}/releases/tag/${{  github.ref_name }}"
-            export PR_TITLE="Release ${{ secrets.AWS_ECR_REPOSITORY }} tag ${{  github.tag }} on ${{ inputs.env }}"
+            export PR_TITLE="Release ${{ secrets.AWS_ECR_REPOSITORY }} tag ${{  inputs.tag }} on ${{ inputs.env }}"
           else
             export USER=${{ github.event.head_commit.author.username }}
             export PR_URL=${{ github.event.head_commit.url }}
