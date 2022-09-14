@@ -20,83 +20,83 @@ env:
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
       
-      # - name: Logging
-      #   run: |
-      #    sudo apt-get install systemd moreutils -yq
-      #    echo "${{toJSON(github.event)}}"
+  #     # - name: Logging
+  #     #   run: |
+  #     #    sudo apt-get install systemd moreutils -yq
+  #     #    echo "${{toJSON(github.event)}}"
           
-      - name: Prepare slack templates
-        id: slack
-        env:
-          JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          TITLE: "$${{ secrets.AWS_ECR_REPOSITORY }} : ${{ inputs.action }} action was triggered! Kicking off the apply on ${{ inputs.env }}. :white_check_mark:"
-        run: |
-          if [[ "${{ github.ref }}" == *"tags"* ]]; then
-            export USER=${{ github.event.head_commit.author.username }}
-            export PR_URL="https://github.com/tagsource/${{ secrets.AWS_ECR_REPOSITORY }}/releases/tag/${{  github.ref_name }}"
-            export PR_TITLE="Release ${{ secrets.AWS_ECR_REPOSITORY }} tag ${{  inputs.tag }} on ${{ inputs.env }}"
-          else
-            export USER=${{ github.event.head_commit.author.username }}
-            export PR_URL=${{ github.event.head_commit.url }}
-            export PR_TITLE=$(echo "${{ github.event.head_commit.message }}" | tr -d '"<>' | tr '"\r\n' ' ')
-          fi
-          # export PR_TITLE=$(echo "${PR_TITLE}" | tr -d '"<>' | tr '"\r\n' ' ')
-          echo $PR_URL
-          echo $(envsubst < ./.github/workflows/slack-templates/approved.json) > notification-approved.json
-          cat notification-approved.json
+  #     - name: Prepare slack templates
+  #       id: slack
+  #       env:
+  #         JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  #         TITLE: "$${{ secrets.AWS_ECR_REPOSITORY }} : ${{ inputs.action }} action was triggered! Kicking off the apply on ${{ inputs.env }}. :white_check_mark:"
+  #       run: |
+  #         if [[ "${{ github.ref }}" == *"tags"* ]]; then
+  #           export USER=${{ github.event.head_commit.author.username }}
+  #           export PR_URL="https://github.com/tagsource/${{ secrets.AWS_ECR_REPOSITORY }}/releases/tag/${{  github.ref_name }}"
+  #           export PR_TITLE="Release ${{ secrets.AWS_ECR_REPOSITORY }} tag ${{  inputs.tag }} on ${{ inputs.env }}"
+  #         else
+  #           export USER=${{ github.event.head_commit.author.username }}
+  #           export PR_URL=${{ github.event.head_commit.url }}
+  #           export PR_TITLE=$(echo "${{ github.event.head_commit.message }}" | tr -d '"<>' | tr '"\r\n' ' ')
+  #         fi
+  #         # export PR_TITLE=$(echo "${PR_TITLE}" | tr -d '"<>' | tr '"\r\n' ' ')
+  #         echo $PR_URL
+  #         echo $(envsubst < ./.github/workflows/slack-templates/approved.json) > notification-approved.json
+  #         cat notification-approved.json
 
-      - name: Notifify Approved Slack
-        id: slack_approved
-        uses: slackapi/slack-github-action@v1.19.0
-        with:
-          payload-file-path: "notification-approved.json"
-          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  #     - name: Notifify Approved Slack
+  #       id: slack_approved
+  #       uses: slackapi/slack-github-action@v1.19.0
+  #       with:
+  #         payload-file-path: "notification-approved.json"
+  #         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+  #       env:
+  #         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           
-      - uses: actions/setup-java@v1
-        id: setup_java
-        with:
-          java-version: 17
-          java-package: jdk
-          architecture: x64
+  #     - uses: actions/setup-java@v1
+  #       id: setup_java
+  #       with:
+  #         java-version: 17
+  #         java-package: jdk
+  #         architecture: x64
         
-      - name: Configure AWS credentials and Assume role
-        id: aws_auth
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
-          role-duration-seconds: 3600
-          role-session-name: GitHubActions-${{ github.run_id }}
-      - name: Identity Check
-        id: aws_auth_check_identity
-        run: aws sts get-caller-identity
+  #     - name: Configure AWS credentials and Assume role
+  #       id: aws_auth
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-region: ${{ secrets.AWS_REGION }}
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
+  #         role-duration-seconds: 3600
+  #         role-session-name: GitHubActions-${{ github.run_id }}
+  #     - name: Identity Check
+  #       id: aws_auth_check_identity
+  #       run: aws sts get-caller-identity
           
-      - name: Login to Amazon ECR
-        id: login_ecr
-        run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPOSITORY_URL }}
+  #     - name: Login to Amazon ECR
+  #       id: login_ecr
+  #       run: |
+  #         aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPOSITORY_URL }}
       
-      - name: Build, tag, and push image to Amazon ECR
-        id: build_push
-        env:
-          ECR_REGISTRY: ${{ secrets.AWS_ECR_REPOSITORY_URL }}
-          ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ inputs.tag }}
-        run: |
-          ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG          
+  #     - name: Build, tag, and push image to Amazon ECR
+  #       id: build_push
+  #       env:
+  #         ECR_REGISTRY: ${{ secrets.AWS_ECR_REPOSITORY_URL }}
+  #         ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
+  #         IMAGE_TAG: ${{ inputs.tag }}
+  #       run: |
+  #         ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
+  #         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG          
 
   deploy:
-    needs: build
+    #needs: build
     runs-on: ubuntu-latest
     steps:
       - name: CheckoutInfrastructureLive
