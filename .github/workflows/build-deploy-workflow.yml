@@ -129,36 +129,36 @@ jobs:
           git commit -am "${COMMIT_MESSAGE}"
           git push
 
-      - name: SetupInfrastructureDeployer
-        id: setup_deployer
-        env:
-          GRUNTWORK_INSTALLER_VERSION: "v0.0.37"
-          MODULE_CI_VERSION: "v0.38.4"
-          MODULE_SECURITY_VERSION: "v0.53.6"
-          GITHUB_OAUTH_TOKEN: ${{ secrets.GH_GRUNTY_OAUTH_TOKEN }}
-        run: |
-          curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh \
-            | bash /dev/stdin --version "$GRUNTWORK_INSTALLER_VERSION"
-          gruntwork-install --repo "https://github.com/gruntwork-io/terraform-aws-ci" \
-            --binary-name "infrastructure-deployer" \
-            --tag "$MODULE_CI_VERSION"
-          gruntwork-install --repo "https://github.com/gruntwork-io/terraform-aws-security" \
-            --module-name "aws-auth" \
-            --tag "$MODULE_SECURITY_VERSION"
+      # - name: SetupInfrastructureDeployer
+      #   id: setup_deployer
+      #   env:
+      #     GRUNTWORK_INSTALLER_VERSION: "v0.0.37"
+      #     MODULE_CI_VERSION: "v0.38.4"
+      #     MODULE_SECURITY_VERSION: "v0.53.6"
+      #     GITHUB_OAUTH_TOKEN: ${{ secrets.GH_GRUNTY_OAUTH_TOKEN }}
+      #   run: |
+      #     curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh \
+      #       | bash /dev/stdin --version "$GRUNTWORK_INSTALLER_VERSION"
+      #     gruntwork-install --repo "https://github.com/gruntwork-io/terraform-aws-ci" \
+      #       --binary-name "infrastructure-deployer" \
+      #       --tag "$MODULE_CI_VERSION"
+      #     gruntwork-install --repo "https://github.com/gruntwork-io/terraform-aws-security" \
+      #       --module-name "aws-auth" \
+      #       --tag "$MODULE_SECURITY_VERSION"
 
-      - name: Configure AWS credentials and Assume role
-        id: aws_auth
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
-          role-duration-seconds: 3600
-          role-session-name: GitHubActions-${{ github.run_id }}
-      - name: Identity Check
-        id: aws_auth_check_identity
-        run: aws sts get-caller-identity
+      # - name: Configure AWS credentials and Assume role
+      #   id: aws_auth
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-region: ${{ secrets.AWS_REGION }}
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
+      #     role-duration-seconds: 3600
+      #     role-session-name: GitHubActions-${{ github.run_id }}
+      # - name: Identity Check
+      #   id: aws_auth_check_identity
+      #   run: aws sts get-caller-identity
 
       # - name: DeployDockerImage
       #   id: deploy_docker_image
