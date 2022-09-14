@@ -30,6 +30,7 @@ jobs:
         env:
           JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           REPO: ${{ secrets.AWS_ECR_REPOSITORY }}
+          ENV: ${{ inputs.env }}
         run: |
           if [[ "${{ github.ref }}" == *"tags"* ]]; then
             export USER=${{ github.event.head_commit.author.username }}
