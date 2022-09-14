@@ -31,7 +31,7 @@ jobs:
           JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           #REPO: ${{ secrets.AWS_ECR_REPOSITORY }}
         run: |
-          if [[ -z "${{ github.ref }}" ]]; then
+          if [[ "${{ github.ref }}" == *"tags"* ]]; then
             export USER=${{ github.event.head_commit.author.username }}
             export PR_URL="https://github.com/tagsource/${{ secrets.AWS_ECR_REPOSITORY }}/releases/tag/${{  github.ref_name }}"
             export PR_TITLE="Release ${{ secrets.AWS_ECR_REPOSITORY }} tag ${{  github.ref_name }} on ${{ inputs.env }}"
