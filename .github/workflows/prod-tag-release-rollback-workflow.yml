@@ -37,10 +37,10 @@ jobs:
         run: |
           git fetch -a
 
-      - name: Logging
-        run: |
-         sudo apt-get install systemd moreutils -yq
-         echo "${{toJSON(github.event)}}"   
+      # - name: Logging
+      #   run: |
+      #    sudo apt-get install systemd moreutils -yq
+      #    echo "${{toJSON(github.event)}}"   
 
       - name: ReleasePublished
         id: changes
@@ -64,10 +64,10 @@ jobs:
           echo ::set-output name=previous_tag::$(git tag --sort version:refname | tail -2 | head -1)
           git tag --sort "-committerdate" 
 
-      - name: Logging
-        run: |
-         sudo apt-get install systemd moreutils -yq
-         echo "${{toJSON(github.event)}}"   
+      # - name: Logging
+      #   run: |
+      #    sudo apt-get install systemd moreutils -yq
+      #    echo "${{toJSON(github.event)}}"   
 
       - name: PreReleasePublished
         id: changes
