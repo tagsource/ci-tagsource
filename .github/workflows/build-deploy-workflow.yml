@@ -127,7 +127,7 @@ jobs:
           git config user.email grunty@tagme.pk
           git diff
           git add ${DEPLOY_PATH}/terragrunt.hcl
-          git commit -am ${COMMIT_MESSAGE}
+          git commit -am "${COMMIT_MESSAGE}"
           git push
 
       - name: SetupInfrastructureDeployer
