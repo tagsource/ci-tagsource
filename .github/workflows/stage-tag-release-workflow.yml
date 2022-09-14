@@ -1,4 +1,4 @@
-name: Build-Deploy Workflow
+name: On-Tag Release Stage Workflow
 
 on:
   workflow_call:
