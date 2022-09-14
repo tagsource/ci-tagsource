@@ -36,7 +36,7 @@ jobs:
       - name: ReleasePublished
         id: changes
         run: |
-          echo "Released ${{ github.ref }}"
+          echo "Released ${{ github.event.release.tag_name }}"
 
   rollback_stage_prod:
     #needs: deploy
