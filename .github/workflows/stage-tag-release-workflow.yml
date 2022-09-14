@@ -33,8 +33,8 @@ jobs:
         id: changes
         run: |
           #git log --no-merges --pretty=format:"%s - author: %cn" '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} 
-          # export DIFF=$(git log --no-merges --pretty=format:"%s - author: %cn" '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )
-          echo ::set-output name=diff::$(git log --no-merges --pretty=format:"%s - author: %cn" '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} | sed ':a;N;$!ba;s/\n/%0A/g' )
+          export DIFF=$(git log --no-merges --pretty=format:"%s - author: %cn" '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )
+          echo "::set-output name=diff::$( echo "$DIFF" | sed ':a;N;$!ba;s/\n/%0A/g' )"
 
       - name: Create release
         id: create_release
