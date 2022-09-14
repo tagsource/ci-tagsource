@@ -1,0 +1,44 @@
+name: On-Release Prod Workflow
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: true
+        type: string
+
+
+env:
+  CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+  CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  
+jobs:
+  deploy_prod:
+    #needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Fetch git tags
+        id: git-fetch
+        run: |
+          git fetch -a
+
+      - name: Logging
+        run: |
+         sudo apt-get install systemd moreutils -yq
+         echo "${{toJSON(github.event)}}"   
+
+      - name: ReleasePublished
+        id: changes
+        run: |
+          echo "Released ${{ github.ref }}"
+
+  # build_deploy_child:
+  #   uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
+  #   secrets: inherit
+  #   with:
+  #     env: dev
