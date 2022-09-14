@@ -47,7 +47,7 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: |
             ${{ steps.changes.outputs.diff }}
-          draft: false
+          draft: true
           prerelease: true
 
   # build_deploy_child:
