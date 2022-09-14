@@ -25,12 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Logging
-        run: |
-         sudo apt-get install systemd moreutils -yq
-         echo "${{toJSON(github.event)}}"
+      # - name: Logging
+      #   run: |
+      #    sudo apt-get install systemd moreutils -yq
+      #    echo "${{toJSON(github.event)}}"
           
-
       - name: Prepare slack templates
         id: slack
         env:
