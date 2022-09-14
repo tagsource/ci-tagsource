@@ -126,7 +126,7 @@ jobs:
           git config user.name ${{ github.event.head_commit.author.username }}
           git config user.email grunty@tagme.pk
           git diff
-          git add .
+          git add ${DEPLOY_PATH}/terragrunt.hcl
           git commit -m ${COMMIT_MESSAGE}
           git push
 
