@@ -61,8 +61,10 @@ jobs:
         id: git-fetch
         run: |
           git fetch -a
-          echo ::set-output name=previous_tag::$(git tag --sort version:refname | tail -2 | head -1)
           git tag --sort "-committerdate" 
+          gh release list
+          echo ::set-output name=previous_tag::$(gh release list | grep Latest | awk '{print $2}')
+          #echo ::set-output name=previous_tag::$(git tag --sort version:refname | tail -2 | head -1)
 
       # - name: Logging
       #   run: |
