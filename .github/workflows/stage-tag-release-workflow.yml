@@ -14,8 +14,17 @@ env:
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   
 jobs:
+
+  build_deploy_stage:
+    uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
+    secrets: inherit
+    with:
+      env: stage
+      tag: ${{  github.ref_name }}
+      action: Deploy
+      
   create_release:
-    #needs: deploy
+    needs: build_deploy_stage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -49,11 +58,3 @@ jobs:
             ${{ steps.changes.outputs.diff }}
           draft: true
           prerelease: true
-
-  build_deploy_stage:
-    uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
-    secrets: inherit
-    with:
-      env: stage
-      tag: ${{  github.ref_name }}
-      action: Deploy
