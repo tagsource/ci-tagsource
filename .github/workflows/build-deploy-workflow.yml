@@ -122,7 +122,7 @@ jobs:
           fi
           echo "Updating service ${ENV} / ${SERVICE} with Tag ${IMAGE_TAG}"
           #ls -l
-          sed -i "s/\(.*tag.*\)[^ ]*\( .*\)/\1 \"${IMAGE_TAG}\"/" ${DEPLOY_PATH}/terragrunt.hcl
+          sed -i "s/\(.*tag .*\)[^ ]*\( .*\)/\1 \"${IMAGE_TAG}\"/" ${DEPLOY_PATH}/terragrunt.hcl
           git config user.name grunty-tagme
           git config user.email grunty@tagme.pk
           git diff
