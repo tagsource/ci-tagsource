@@ -60,7 +60,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           
       - uses: actions/setup-java@v1
-        if: inputs.env != 'prod' && input.action != 'Rollback'
+        if: inputs.env != 'prod' && inputs.action != 'Rollback'
         id: setup_java
         with:
           java-version: 17
@@ -68,7 +68,7 @@ jobs:
           architecture: x64
         
       - name: Configure AWS credentials and Assume role
-        if: inputs.env != 'prod' && input.action != 'Rollback'
+        if: inputs.env != 'prod' && inputs.action != 'Rollback'
         id: aws_auth
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -80,18 +80,18 @@ jobs:
           role-session-name: GitHubActions-${{ github.run_id }}
 
       - name: Identity Check
-        if: inputs.env != 'prod' && input.action != 'Rollback'
+        if: inputs.env != 'prod' && inputs.action != 'Rollback'
         id: aws_auth_check_identity
         run: aws sts get-caller-identity
           
       - name: Login to Amazon ECR
-        if: inputs.env != 'prod' && input.action != 'Rollback'
+        if: inputs.env != 'prod' && inputs.action != 'Rollback'
         id: login_ecr
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPOSITORY_URL }}
       
       - name: Build, tag, and push image to Amazon ECR
-        if: inputs.env != 'prod' && input.action != 'Rollback'
+        if: inputs.env != 'prod' && inputs.action != 'Rollback'
         id: build_push
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ECR_REPOSITORY_URL }}
