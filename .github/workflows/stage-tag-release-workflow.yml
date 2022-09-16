@@ -65,7 +65,7 @@ jobs:
           echo $pr_list
           #echo ::set-output name=diff::$(git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )
           while read pr; do
-            pr_id =$(echo $pr | awk '{print $3}' | sed 's/#//')
+            pr_id=$(echo $pr | awk '{print $3}' | sed 's/#//')
             echo $pr_id
             #gh pr edit 23 --add-label "released_stage,${{ github.ref }}"
           done <<< "$pr_list"
