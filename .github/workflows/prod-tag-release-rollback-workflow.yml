@@ -90,6 +90,16 @@ jobs:
         run: |
           echo "Rollback to ${{ steps.git-fetch.outputs.previous_tag }} to prod as a result of Publish PreRelease event!"
 
+      - name: Remove Label PR in release
+        id: pr_remove_label
+        run: |
+          git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }}
+          while read pr; do
+            pr_id=$(echo $pr | awk '{print $4}' | sed 's/#//')
+            echo $pr_id
+            gh pr edit $pr_id --remove-label "released_stage,released_prod"
+          done <<< "$(git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )"
+
   rollback_stage:
     needs: rollback_prepare
     uses: tagsource/ci-tagsource/.github/workflows/build-deploy-workflow.yml@main
