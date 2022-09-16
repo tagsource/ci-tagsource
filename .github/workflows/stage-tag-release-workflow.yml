@@ -12,6 +12,7 @@ env:
   CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
   CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  GH_TOKEN: ${{ secrets.GH_GRUNTY_OAUTH_TOKEN }}
   
 jobs:
 
