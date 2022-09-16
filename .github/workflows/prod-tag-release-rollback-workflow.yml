@@ -12,6 +12,7 @@ env:
   CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
   CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  GH_TOKEN: ${{ secrets.GH_GRUNTY_OAUTH_TOKEN }}
   
 jobs:
   build_deploy_prod:
@@ -36,6 +37,8 @@ jobs:
         id: git-fetch
         run: |
           git fetch -a
+          echo ::set-output name=previous_tag::$(git tag --sort version:refname | tail -2 | head -1)
+          git tag --sort "-committerdate" 
 
       # - name: Logging
       #   run: |
@@ -46,6 +49,17 @@ jobs:
         id: changes
         run: |
           echo "Releasing ${{ github.event.release.tag_name }} to prod as a result of Publish Release event!"
+      
+      - name: Label PR in release
+        id: pr_history_label
+        run: |
+          git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }}
+          while read pr; do
+            pr_id=$(echo $pr | awk '{print $4}' | sed 's/#//')
+            echo $pr_id
+            gh pr edit $pr_id --add-label "released_prod"
+          done <<< "$(git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )"
+      
 
   rollback_prepare:
     runs-on: ubuntu-latest
