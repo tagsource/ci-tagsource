@@ -22,7 +22,7 @@ jobs:
       env: stage
       tag: ${{  github.ref_name }}
       action: Deploy
-      
+
   create_release:
     needs: build_deploy_stage
     runs-on: ubuntu-latest
@@ -44,7 +44,6 @@ jobs:
           #git log --no-merges --pretty=format:"%s - author: %cn" '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} 
           # export DIFF=$(git log --no-merges --pretty=format:"%s - author: %cn" '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )
           echo ::set-output name=diff::$(git log --no-merges --pretty=format:"%s - author: %cn" '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} | sed ':a;N;$!ba;s/\n/%0A/g' )
-          
 
       - name: Create release
         id: create_release
@@ -58,3 +57,16 @@ jobs:
             ${{ steps.changes.outputs.diff }}
           draft: true
           prerelease: true
+          
+      - name: Label PR in release
+        id: pr_history_label
+        run: |
+          pr_list=$(git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )
+          echo $pr_list
+          #echo ::set-output name=diff::$(git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )
+          while read pr; do
+            pr_id =$(echo $pr | awk '{print $3}' | | sed 's/#//')
+            echo $pr_id
+            #gh pr edit 23 --add-label "released_stage,${{ github.ref }}"
+          done <<< "$pr_list"
+
