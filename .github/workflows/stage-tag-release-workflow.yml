@@ -62,13 +62,13 @@ jobs:
       - name: Label PR in release
         id: pr_history_label
         run: |
+          gh label create released_stage -f
+          gh label create released_prod -f
+          gh label create ${{ github.ref_name }} -f
           git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }}
           while read pr; do
             pr_id=$(echo $pr | awk '{print $4}' | sed 's/#//')
             echo $pr_id
-            gh label create released_stage -f
-            gh label create released_prod -f
-            gh label create ${{ github.ref_name }} -f
             gh pr edit $pr_id --add-label "released_stage,${{ github.ref_name }}"
           done <<< "$(git log --merges --grep 'Merge pull request' --pretty=format:%s '${{ steps.git-fetch.outputs.previous_tag }}^'..${{ github.ref }} )"
 
