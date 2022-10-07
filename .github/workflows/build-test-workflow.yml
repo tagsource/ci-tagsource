@@ -2,6 +2,11 @@ name: Pull Request Build
 
 on:
   workflow_call:
+    inputs:
+      builder:
+        required: false
+        type: string
+        default: 'maven'
 
 env:
   CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
@@ -19,4 +24,9 @@ jobs:
           java-package: jdk
           architecture: x64
       - name: Run maven build
-        run: ./mvnw clean verify
+        run: |
+          if [[ “${{ inputs.builder }}” == *“maven”* ]]; then
+            ./mvnw clean verify
+          else
+            ./gradlew test
+          fi

@@ -105,7 +105,7 @@ jobs:
           if [[ “${{ inputs.builder }}” == *“maven”* ]]; then
             ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
           else
-          ./gradlew bootBuildImage --imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
+            ./gradlew bootBuildImage --imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
           fi
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG          
 
