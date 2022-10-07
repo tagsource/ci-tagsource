@@ -23,7 +23,7 @@ jobs:
           java-version: 17
           java-package: jdk
           architecture: x64
-      - name: Run maven build
+      - name: Run build
         run: |
           if [[ “${{ inputs.builder }}” == *“maven”* ]]; then
             ./mvnw clean verify
