@@ -6,6 +6,10 @@ on:
       env:
         required: true
         type: string
+      builder:
+        required: false
+        type: string
+        default: 'maven'
 
 
 env:
@@ -23,6 +27,7 @@ jobs:
       env: stage
       tag: ${{  github.ref_name }}
       action: Deploy
+      builder: ${{ inputs.builder }}
 
   create_release:
     needs: build_deploy_stage
