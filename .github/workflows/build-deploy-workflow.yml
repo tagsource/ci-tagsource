@@ -12,6 +12,10 @@ on:
       action:
         required: true
         type: string
+      builder:
+        required: false
+        type: string
+        default: 'maven'
 
 
 env:
@@ -98,7 +102,11 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
           IMAGE_TAG: ${{ inputs.tag }}
         run: |
-          ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
+          if [[ “${{ inputs.builder }}” == *“maven”* ]]; then
+            ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
+          else
+          ./gradlew bootBuildImage --imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG"
+          fi
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG          
 
   deploy:
