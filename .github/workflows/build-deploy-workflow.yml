@@ -103,7 +103,7 @@ jobs:
           IMAGE_TAG: ${{ inputs.tag }}
         run: |
           case "${{ inputs.builder }}" in 
-            maven) ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG";;
+            maven) ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG" -DskipTests=true;;
             gradle*) ./gradlew bootBuildImage --imageName="$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG";;
             docker) docker build -t "$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG" .;;
             *) echo "builder ${{ inputs.builder }} not defined!" && exit 1 
