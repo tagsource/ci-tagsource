@@ -26,7 +26,7 @@ jobs:
       - name: Run build
         run: |
           case "${{ inputs.builder }}" in 
-            maven) ./mvnw clean verify -DskipTests=true;;
+            maven) ./mvnw clean verify;;
             gradle*) ./gradlew test;;
             docker) docker build .;;
             *) echo "builder ${{ inputs.builder }} not defined!" && exit 1 
