@@ -117,8 +117,8 @@ jobs:
           esac
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           # tag and upload to docker
-          docker tag "$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG" docker.io/zuzasky/tagme:inception-latest
-          docker push docker.io/zuzasky/tagme:inception-latest
+          docker tag "$ECR_REGISTRY/$ECR_REPOSITORY":"$IMAGE_TAG" docker.io/zuzasky/tagme:${ECR_REPOSITORY}-latest
+          docker push docker.io/zuzasky/tagme:${ECR_REPOSITORY}-latest
 
   deploy:
     needs: build
